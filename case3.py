@@ -6,7 +6,7 @@ import sys
 
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
-RUNNING_TIME = 10 ** 7      # 10초
+RUNNING_TIME = 10 ** 5      # 0.1초
 
 NODES = 0                   # node의 개수
 CW = 32                     # uniform CW
