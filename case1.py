@@ -69,6 +69,7 @@ class Node:
         self.state = ST_BACKOFF
         slot = randrange(1, CW+1)
         self.state_left = slot * 50
+        self.collision = False      # 현재의 충돌이 해소되었으므로 상태 제거
 
     ## 외부에서 호출하는 함수들
     def process(self):
