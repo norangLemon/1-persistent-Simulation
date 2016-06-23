@@ -20,12 +20,10 @@ ST_GEN_PACK = 0     # packet 생성중
 ST_SENSE_IDLE = 1   # idle인지 sensing 중
 ST_WAIT_IDLE = 2    # idle이 될 때까지 기다리는 중
 ST_TRS_PACK = 3     # packet 전송중
-ST_WAIT_ACK = 4     # ack 기다리는 중
-ST_BACKOFF = 5      # back off 만큼 기다리는 중
+ST_BACKOFF = 4      # back off 만큼 기다리는 중
 
 T_IDLE = 50         # idle sense하는 시간
 T_PACK = 819        # packet 전송 시간
-T_ACK = 50          # time out 될 때까지 ack를 기다리는 시간
 
 T_GEN = 10000       # pack 생성에 걸리는 평균 시간
 
@@ -34,13 +32,11 @@ class Node:
     global ST_SENSE_IDLE
     global ST_WAIT_IDLE
     global ST_TRS_PACK
-    global ST_WAIT_ACK
     global ST_BACKOFF 
 
     global T_IDLE
     global T_PACK
     global CW
-    global T_ACK
 
     global T_GEN
 
@@ -92,29 +88,19 @@ class Node:
             
 
             elif self.state == ST_TRS_PACK and self.collision == True:
-                # 충돌 난 경우 -> 일단 연결 종료 후 50μs간 ack 기다리기
+                # 충돌 난 경우 -> 일단 연결 종료 후 back off
                 global transmitting
                 transmitting.remove(self.number)
                 
-                self.state = ST_WAIT_ACK
-                self.state_left = T_ACK
-
-            elif self.state == ST_TRS_PACK and self.collision == False:
-                # 충돌 안 난 경우 -> 일단 연결 종료 후 1μs간 ack기다리기
-                global transmitting
-                transmitting.remove(self.number)
-
-                self.state = ST_WAIT_ACK
-                self.state_left = 1
-
-            elif self.state == ST_WAIT_ACK and self.collision == True:
-                # 충돌 난 경우 -> backoff하고 충돌 횟수 1 증가
                 self.backoff()
                 global collision
                 collision += 1
 
-            elif self.state == ST_WAIT_ACK and self.collision == False:
-                # 충돌 안 난 경우 -> 다시 packet 생성
+            elif self.state == ST_TRS_PACK and self.collision == False:
+                # 충돌 안 난 경우 -> 연결 종료 후 새 패킷 생성 대기
+                global transmitting
+                transmitting.remove(self.number)
+
                 self.waiting_packet = False
                 self.generate()
 
@@ -151,6 +137,7 @@ class Node:
     def collide(self):
         # 충돌에 대한 처리를 한다
         self.collision = True
+        self.state_left = 0     # 충돌 즉시 전송이 종료됨
 
 
 def Throughput(trial, collision):
