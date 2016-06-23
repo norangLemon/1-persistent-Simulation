@@ -1,8 +1,10 @@
 from random import *
 from math import *
 
-RUNNING_TIME = 10000 # 10 ** 8      # 100초
-NODES = 5                   # node의 개수
+RUNNING_TIME = 10 ** 8      # 100초
+
+NODES = 0                   # node의 개수
+CW = 32                     # uniform CW
 
 node = []                   # 현재 line에 연결된 node 객체들
 transmitting = []           # 현재 line에 data를 전송중인 node의 번호
@@ -23,7 +25,6 @@ ST_BACKOFF = 5      # back off 만큼 기다리는 중
 
 T_IDLE = 50         # idle sense하는 시간
 T_PACK = 819        # packet 전송 시간
-T_CW = 32*50        # uniform CW
 T_ACK = 50          # time out 될 때까지 ack를 기다리는 시간
 
 T_GEN = 10000       # pack 생성에 걸리는 평균 시간
@@ -38,7 +39,7 @@ class Node:
 
     global T_IDLE
     global T_PACK
-    global T_CW
+    global CW
     global T_ACK
 
     global T_GEN
@@ -63,11 +64,10 @@ class Node:
         while x == 0:
             x = random()
         self.state_left = round(-1 * T_GEN * log(x))
-        print("gen [%d]: after %d" %(self.number, self.state_left))
 
     def backoff(self):
         self.state = ST_BACKOFF
-        slot = T_CW * random()
+        slot = CW * random()
         self.state_left = round(slot) * 50
 
     ## 외부에서 호출하는 함수들
@@ -136,7 +136,6 @@ class Node:
 
 
         # 현재 state 1μs 진행
-        print(self.state, end = " ")
         self.state_left -= 1
 
         if len(transmitting) != 0:
@@ -152,20 +151,47 @@ class Node:
         # 충돌에 대한 처리를 한다
         self.collision = True
 
+if __name__ == "__main__":
 
-for num in range(0, NODES):
-    node.append(Node(num))
+    node_list = [5, 10, 15, 20, 25]
+    CW_list = [32, 64, 128]
 
-for time in range(0, RUNNING_TIME):
+    for NODES_ in node_list:
+        NODES = NODES_
+        print("Nodes CW Throughput M_delay Col_prob.") 
+        for CW_ in CW_list:
+            CW = CW_
+            
+            cnt = 10
+            while cnt > 0:
+                cnt -= 1
+                
+                for num in range(0, NODES):
+                    node.append(Node(num))
 
-    for n in range(0, NODES):
-        # 이번 시간에 각 노드에서 수행하는 일을 진행시킴
-        node[n].process()
+                for time in range(0, RUNNING_TIME):
+
+                    for n in range(0, NODES):
+                        # 이번 시간에 각 노드에서 수행하는 일을 진행시킴
+                        node[n].process()
 
 
-    if len(transmitting) > 1:
-        # 한번에 여러 노드가 전송중인 경우 충돌이 난 것
-        for i in transmitting:
-            node[i].collide()
-    print("[%d] collision: %d trial: %d delay: %d" % (time, collision, trial, delay))
+                    if len(transmitting) > 1:
+                        # 한번에 여러 노드가 전송중인 경우 충돌이 난 것
+                        for i in transmitting:
+                            node[i].collide()
+                
+                t = Throughput(trial, collision)
+                m = MeanDelay(delay, trial, collision)
+                c = CollisionPlob(trial, collision)
+                print("%d %d %d %d %d" % (NODE, CW, t, m, c)) 
 
+def Throughput(trial, collision):
+    global RUNNING_TIME
+    return (trial - collision)/RUNNING_TIME
+
+def MeanDelay(delay, trial, collision):
+    return delay/(trial - collision)
+
+def CollisionPlob(trial, collision):
+    return collision/trial
