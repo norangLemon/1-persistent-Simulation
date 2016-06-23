@@ -28,18 +28,6 @@ T_PACK = 819        # packet 전송 시간
 T_GEN = 10000       # pack 생성에 걸리는 평균 시간
 
 class Node: 
-    global ST_GEN_PACK
-    global ST_SENSE_IDLE
-    global ST_WAIT_IDLE
-    global ST_TRS_PACK
-    global ST_BACKOFF 
-
-    global T_IDLE
-    global T_PACK
-    global CW
-
-    global T_GEN
-
     def __init__(self, number):
 
         self.state = 0              # 현재 state
@@ -54,6 +42,7 @@ class Node:
         self.generate()
 
     def generate(self):
+        global ST_GEN_PACK
         # 전송할 새 packet을 생성한다
         self.state = ST_GEN_PACK
         x = random()
@@ -62,6 +51,7 @@ class Node:
         self.state_left = round(-1 * T_GEN * log(x))
 
     def backoff(self):
+        global ST_BACKOFF 
         self.state = ST_BACKOFF
         slot = randrange(1, CW+1)
         self.state_left = slot * 50
@@ -69,6 +59,22 @@ class Node:
 
     ## 외부에서 호출하는 함수들
     def process(self):
+        global ST_GEN_PACK
+        global ST_SENSE_IDLE
+        global ST_WAIT_IDLE
+        global ST_TRS_PACK
+        global ST_BACKOFF 
+
+        global T_IDLE
+        global T_PACK
+        global CW
+
+        global T_GEN
+
+        global transmitting
+        global trial
+        global collision
+        global delay
         # 이번 시간 프레임에 해야 할 일을 진행시킨다
         if self.state_left == 0:
             # 다음 state로 넘어간다
@@ -82,24 +88,19 @@ class Node:
                 # idle 50μs 유지됨 -> 전송
                 self.state = ST_TRS_PACK
                 self.state_left = T_PACK
-                global trial
                 trial += 1
-                global transmitting
                 transmitting.append(self.number)
             
 
             elif self.state == ST_TRS_PACK and self.collision == True:
                 # 충돌 난 경우 -> 일단 연결 종료 후 back off
-                global transmitting
                 transmitting.remove(self.number)
                 
                 self.backoff()
-                global collision
                 collision += 1
 
             elif self.state == ST_TRS_PACK and self.collision == False:
                 # 충돌 안 난 경우 -> 연결 종료 후 새 패킷 생성 대기
-                global transmitting
                 transmitting.remove(self.number)
 
                 self.waiting_packet = False

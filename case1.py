@@ -30,19 +30,6 @@ T_ACK = 50          # time out 될 때까지 ack를 기다리는 시간
 T_GEN = 10000       # pack 생성에 걸리는 평균 시간
 
 class Node: 
-    global ST_GEN_PACK
-    global ST_SENSE_IDLE
-    global ST_WAIT_IDLE
-    global ST_TRS_PACK
-    global ST_WAIT_ACK
-    global ST_BACKOFF 
-
-    global T_IDLE
-    global T_PACK
-    global CW
-    global T_ACK
-
-    global T_GEN
 
     def __init__(self, number):
 
@@ -58,6 +45,7 @@ class Node:
         self.generate()
 
     def generate(self):
+        global ST_GEN_PACK
         # 전송할 새 packet을 생성한다
         self.state = ST_GEN_PACK
         x = random()
@@ -66,6 +54,7 @@ class Node:
         self.state_left = round(-1 * T_GEN * log(x))
 
     def backoff(self):
+        global ST_BACKOFF 
         self.state = ST_BACKOFF
         slot = randrange(1, CW+1)
         self.state_left = slot * 50
@@ -73,6 +62,24 @@ class Node:
 
     ## 외부에서 호출하는 함수들
     def process(self):
+        global ST_GEN_PACK
+        global ST_SENSE_IDLE
+        global ST_WAIT_IDLE
+        global ST_TRS_PACK
+        global ST_WAIT_ACK
+        global ST_BACKOFF 
+
+        global T_IDLE
+        global T_PACK
+        global CW
+        global T_ACK
+
+        global T_GEN
+
+        global transmitting
+        global trial
+        global collision
+        global delay
         # 이번 시간 프레임에 해야 할 일을 진행시킨다
         if self.state_left == 0:
             # 다음 state로 넘어간다
@@ -86,15 +93,13 @@ class Node:
                 # idle 50μs 유지됨 -> 전송
                 self.state = ST_TRS_PACK
                 self.state_left = T_PACK
-                global trial
                 trial += 1
-                global transmitting
+                print("push: %d" %self.number)
                 transmitting.append(self.number)
-            
 
             elif self.state == ST_TRS_PACK and self.collision == True:
                 # 충돌 난 경우 -> 일단 연결 종료 후 50μs간 ack 기다리기
-                global transmitting
+                print("crash: %d" %self.number)
                 transmitting.remove(self.number)
                 
                 self.state = ST_WAIT_ACK
@@ -102,7 +107,7 @@ class Node:
 
             elif self.state == ST_TRS_PACK and self.collision == False:
                 # 충돌 안 난 경우 -> 일단 연결 종료 후 1μs간 ack기다리기
-                global transmitting
+                print("complete: %d" %self.number)
                 transmitting.remove(self.number)
 
                 self.state = ST_WAIT_ACK
@@ -111,7 +116,6 @@ class Node:
             elif self.state == ST_WAIT_ACK and self.collision == True:
                 # 충돌 난 경우 -> backoff하고 충돌 횟수 1 증가
                 self.backoff()
-                global collision
                 collision += 1
 
             elif self.state == ST_WAIT_ACK and self.collision == False:
@@ -146,7 +150,6 @@ class Node:
             self.busy = False
         
         if self.waiting_packet:
-            global delay
             delay += 1
 
     def collide(self):
@@ -199,6 +202,7 @@ if __name__ == "__main__":
                 m = MeanDelay(delay, trial, collision)
                 c = CollisionPlob(trial, collision)
                 print("%d %d %0.2f %0.2f %0.2f" % (NODES, CW, t, m, c))
+                
                 trial = 0
                 collision = 0
                 delay = 0

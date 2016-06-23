@@ -28,16 +28,6 @@ T_PACK = 819        # packet 전송 시간
 T_GEN = 10000       # pack 생성에 걸리는 평균 시간
 
 class Node: 
-    global ST_GEN_PACK
-    global ST_SENSE_IDLE
-    global ST_WAIT_IDLE
-    global ST_TRS_PACK
-    global ST_BACKOFF 
-
-    global T_IDLE
-    global T_PACK
-
-    global T_GEN
 
     def __init__(self, number):
 
