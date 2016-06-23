@@ -1,7 +1,7 @@
 from random import *
 from math import *
 
-RUNNING_TIME = 10 ** 7      # 10초
+RUNNING_TIME = 10 ** 6      # 1초
 
 NODES = 0                   # node의 개수
 CW = 32                     # uniform CW
@@ -175,7 +175,7 @@ if __name__ == "__main__":
         for CW_ in CW_list:
             CW = CW_
             
-            cnt = 10
+            cnt = 5
             while cnt > 0:
                 cnt -= 1
                 
