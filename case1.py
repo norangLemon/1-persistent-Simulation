@@ -1,7 +1,12 @@
+from __future__ import print_function
 from random import *
 from math import *
+import sys
 
-RUNNING_TIME = 10 ** 8      # 100초
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+RUNNING_TIME = 10 ** 5      # 0.1초
 
 NODES = 0                   # node의 개수
 CW = 32                     # uniform CW
@@ -179,6 +184,7 @@ if __name__ == "__main__":
             while cnt > 0:
                 cnt -= 1
                 
+                eprint("Node(%d) CW(%d) cnt(%d)" %(NODES, CW, cnt))
                 for num in range(0, NODES):
                     node.append(Node(num))
 
@@ -193,7 +199,6 @@ if __name__ == "__main__":
                         # 한번에 여러 노드가 전송중인 경우 충돌이 난 것
                         for i in transmitting:
                             node[i].collide()
-                    #print("{%d} collision: %d trial: %d delay: %d" % (time, collision, trial, delay))
                 
                 t = Throughput(trial, collision)
                 m = MeanDelay(delay, trial, collision)
