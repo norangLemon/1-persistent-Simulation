@@ -151,6 +151,17 @@ class Node:
         # 충돌에 대한 처리를 한다
         self.collision = True
 
+
+def Throughput(trial, collision):
+    global RUNNING_TIME
+    return (trial - collision)/RUNNING_TIME
+
+def MeanDelay(delay, trial, collision):
+    return delay/(trial - collision)
+
+def CollisionPlob(trial, collision):
+    return collision/trial
+
 if __name__ == "__main__":
 
     node_list = [5, 10, 15, 20, 25]
@@ -185,13 +196,3 @@ if __name__ == "__main__":
                 m = MeanDelay(delay, trial, collision)
                 c = CollisionPlob(trial, collision)
                 print("%d %d %d %d %d" % (NODE, CW, t, m, c)) 
-
-def Throughput(trial, collision):
-    global RUNNING_TIME
-    return (trial - collision)/RUNNING_TIME
-
-def MeanDelay(delay, trial, collision):
-    return delay/(trial - collision)
-
-def CollisionPlob(trial, collision):
-    return collision/trial
