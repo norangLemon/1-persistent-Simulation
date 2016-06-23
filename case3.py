@@ -199,3 +199,4 @@ if __name__ == "__main__":
                 collision = 0
                 delay = 0
                 transmitting = []
+                node = []

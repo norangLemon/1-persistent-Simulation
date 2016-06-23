@@ -94,12 +94,10 @@ class Node:
                 self.state = ST_TRS_PACK
                 self.state_left = T_PACK
                 trial += 1
-                print("push: %d" %self.number)
                 transmitting.append(self.number)
 
             elif self.state == ST_TRS_PACK and self.collision == True:
                 # 충돌 난 경우 -> 일단 연결 종료 후 50μs간 ack 기다리기
-                print("crash: %d" %self.number)
                 transmitting.remove(self.number)
                 
                 self.state = ST_WAIT_ACK
@@ -107,7 +105,6 @@ class Node:
 
             elif self.state == ST_TRS_PACK and self.collision == False:
                 # 충돌 안 난 경우 -> 일단 연결 종료 후 1μs간 ack기다리기
-                print("complete: %d" %self.number)
                 transmitting.remove(self.number)
 
                 self.state = ST_WAIT_ACK
@@ -141,7 +138,7 @@ class Node:
 
 
         # 현재 state 1μs 진행
-        #print("[%d] %d" %(self.state, self.state_left), end = " ")
+       # print("[%d] %d" %(self.state, self.state_left), end = " ")
         self.state_left -= 1
 
         if len(transmitting) != 0:
@@ -196,7 +193,7 @@ if __name__ == "__main__":
                         # 한번에 여러 노드가 전송중인 경우 충돌이 난 것
                         for i in transmitting:
                             node[i].collide()
-                   # print("{%d} collision: %d trial: %d delay: %d" % (time, collision, trial, delay))
+                    #print("{%d} collision: %d trial: %d delay: %d" % (time, collision, trial, delay))
                 
                 t = Throughput(trial, collision)
                 m = MeanDelay(delay, trial, collision)
@@ -207,3 +204,4 @@ if __name__ == "__main__":
                 collision = 0
                 delay = 0
                 transmitting = []
+                node = []
