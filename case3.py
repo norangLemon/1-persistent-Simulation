@@ -77,6 +77,11 @@ class Node:
         global T_PACK
 
         global T_GEN
+        
+        global trial
+        global transmitting
+        global collision
+        global delay
         # 이번 시간 프레임에 해야 할 일을 진행시킨다
         if self.state_left == 0:
             # 다음 state로 넘어간다
@@ -90,24 +95,19 @@ class Node:
                 # idle 50μs 유지됨 -> 전송
                 self.state = ST_TRS_PACK
                 self.state_left = T_PACK
-                global trial
                 trial += 1
-                global transmitting
                 transmitting.append(self.number)
             
 
             elif self.state == ST_TRS_PACK and self.collision == True:
                 # 충돌 난 경우 -> 일단 연결 종료 후 back off
-                global transmitting
                 transmitting.remove(self.number)
                 
                 self.backoff()
-                global collision
                 collision += 1
 
             elif self.state == ST_TRS_PACK and self.collision == False:
                 # 충돌 안 난 경우 -> 연결 종료 후 새 패킷 생성 대기
-                global transmitting
                 transmitting.remove(self.number)
 
                 self.waiting_packet = False
@@ -141,7 +141,6 @@ class Node:
             self.busy = False
         
         if self.waiting_packet:
-            global delay
             delay += 1
 
     def collide(self):
