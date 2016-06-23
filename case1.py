@@ -198,4 +198,8 @@ if __name__ == "__main__":
                 t = Throughput(trial, collision)
                 m = MeanDelay(delay, trial, collision)
                 c = CollisionPlob(trial, collision)
-                print("%d %d %0.2f %0.2f %0.2f" % (NODES, CW, t, m, c)) 
+                print("%d %d %0.2f %0.2f %0.2f" % (NODES, CW, t, m, c))
+                trial = 0
+                collision = 0
+                delay = 0
+                transmitting = []
