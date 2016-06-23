@@ -1,7 +1,7 @@
 from random import *
 from math import *
 
-RUNNING_TIME = 10 ** 8      # 100초
+RUNNING_TIME = 10 ** 7     # 10초
 
 NODES = 0                   # node의 개수
 CW = 32                     # uniform CW
@@ -123,7 +123,7 @@ class Node:
 
 
         # 현재 state 1μs 진행
-        print("[%d] %d" %(self.state, self.state_left), end = " ")
+        #print("[%d] %d" %(self.state, self.state_left), end = " ")
         self.state_left -= 1
 
         if len(transmitting) != 0:
@@ -140,10 +140,9 @@ class Node:
         self.collision = True
         self.state_left = 0     # 충돌 즉시 전송이 종료됨
 
-
 def Throughput(trial, collision):
     global RUNNING_TIME
-    return (trial - collision)/RUNNING_TIME
+    return (trial - collision)* 1000000/RUNNING_TIME
 
 def MeanDelay(delay, trial, collision):
     return delay/(trial - collision)
@@ -156,9 +155,9 @@ if __name__ == "__main__":
     node_list = [5, 10, 15, 20, 25]
     CW_list = [32, 64, 128]
 
+    print("Nodes CW Throughput M_delay Col_prob.") 
     for NODES_ in node_list:
         NODES = NODES_
-        print("Nodes CW Throughput M_delay Col_prob.") 
         for CW_ in CW_list:
             CW = CW_
             
@@ -180,9 +179,9 @@ if __name__ == "__main__":
                         # 한번에 여러 노드가 전송중인 경우 충돌이 난 것
                         for i in transmitting:
                             node[i].collide()
-                    print("{%d} collision: %d trial: %d delay: %d" % (time, collision, trial, delay))
+                    #print("{%d} collision: %d trial: %d delay: %d" % (time, collision, trial, delay))
                 
                 t = Throughput(trial, collision)
                 m = MeanDelay(delay, trial, collision)
                 c = CollisionPlob(trial, collision)
-                print("%d %d %d %d %d" % (NODE, CW, t, m, c)) 
+                print("%d %d %0.2f %0.2f %0.2f" % (NODES, CW, t, m, c)) 
