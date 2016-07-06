@@ -1,13 +1,9 @@
 Data Communication: Simulation HW
 -----
 
-2016년 1학기 데이타통신 기말과제
-
-## Introduction
-
-## System description
-
-## Simulation model
+### Introduction
+본 repo는 2016년 1학기 데이타통신 기말과제이다.
+해당 code는 실제 과제로 제출되었다.
 
 ### 기본 가정
 * 모든 event는 1μs 단위로 일어난다고 가정한다.
@@ -28,7 +24,5 @@ Data Communication: Simulation HW
 이때 ack를 보내는 node의 번호를 편의상 ack를 받는 node의 번호로 설정한다.
 ack 전송 시작과 끝을 해당 node에서 관리한다.
 
-## Numerical results & Discussion
-## Conclusion
 
 
